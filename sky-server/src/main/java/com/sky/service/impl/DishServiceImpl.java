@@ -11,6 +11,7 @@ import com.sky.entity.DishFlavor;
 import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
+import com.sky.mapper.SetmealDishMapper;
 import com.sky.result.PageResult;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
@@ -35,6 +36,8 @@ public class DishServiceImpl implements DishService {
 
     @Autowired
     private DishFlavorMapper dishFlavorMapper;
+    @Autowired
+    private SetmealDishMapper setmealDishMapper;
 
     /**
      * 新增菜品和口味数据
@@ -85,6 +88,7 @@ public class DishServiceImpl implements DishService {
      * @param ids id
      */
     @Override
+    @Transactional
     public void delete(List<Long> ids) {
         //要删除三张表
 
@@ -96,11 +100,21 @@ public class DishServiceImpl implements DishService {
                throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
            }
         }
+
         //2 如果当前菜品是否被某个套餐关联
+        List<Long> setmealIds= setmealDishMapper.getSetmealIdsByDishIds(ids);
+        if (setmealIds!=null && setmealIds.size()>0){
+            throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
+        }
 
         //3 如果都能删除
-        //3.1 删除菜品表中的数据
-        //3.2 删除菜品关联的口味表的数据
+        for (Long id : ids) {
+            //3.1 删除菜品表中的数据
+            dishMapper.deleteById(id);
+            //3.2 删除菜品关联的口味表的数据
+            dishFlavorMapper.deleteByDishIds(id);
+        }
+
 
     }
 }
