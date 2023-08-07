@@ -160,7 +160,6 @@ public class DishServiceImpl implements DishService {
      */
     @Override
     public void updateWithFlavor(DishDTO dishDTO) {
-        //口味修改很复杂
         // 先修改基本信息
         Dish dish = new Dish();
         BeanUtils.copyProperties(dishDTO,dish);
