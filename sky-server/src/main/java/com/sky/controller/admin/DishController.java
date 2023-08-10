@@ -74,16 +74,7 @@ public class DishController {
         DishVO dishVO=dishService.getByIdWithFlavor(id);
         return Result.success(dishVO);
     }
-    //
-    // @PostMapping("status/{status}")
-    // @ApiOperation(value = "起售停售菜品")//
-    // public Result startOtStop(@PathVariable Integer status,Long id){
-    //     // public Result startOtStop(@PathVariable("status") Integer status,Long id){//变量同名可以省略
-    //     log.info("起售停售菜品:{},{}",status,id);
-    //     dishService.startOtStop(status,id);
-    //     return Result.success();
-    // }
-    //
+
     @PutMapping
     @ApiOperation(value = "修改菜品")//用在方法上的描述注解
     public  Result update(@RequestBody DishDTO dishDTO){
@@ -92,4 +83,14 @@ public class DishController {
         return Result.success();
 
     }
+
+    @PostMapping("status/{status}")
+    @ApiOperation(value = "起售停售菜品")//
+    public Result startOtStop(@PathVariable Integer status,Long id){
+        // public Result startOtStop(@PathVariable("status") Integer status,Long id){//变量同名可以省略
+        log.info("起售停售菜品:{},{}",status,id);
+        dishService.startOtStop(status,id);
+        return Result.success();
+    }
+
 }
