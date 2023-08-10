@@ -3,6 +3,7 @@ package com.sky.mapper;
 import com.sky.annotaction.AutoFill;
 import com.sky.entity.Setmeal;
 import com.sky.enumeration.OperationType;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -30,4 +31,7 @@ public interface SetmealMapper {
      */
     @AutoFill(OperationType.UPDATE)
     void update(Setmeal setmeal);
+
+    @AutoFill(value = OperationType.INSERT)
+    void insert(Setmeal setmeal);
 }
