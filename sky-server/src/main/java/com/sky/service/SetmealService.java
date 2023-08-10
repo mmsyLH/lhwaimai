@@ -44,4 +44,19 @@ public interface SetmealService {
      * @param ids id
      */
     void delete(List<Long> ids);
+
+    /**
+     * 通过id查询套餐
+     *
+     * @param id id
+     * @return {@link SetmealVO}
+     */
+    SetmealVO getByIdWithDish(Long id);
+
+    /**
+     * 更新套餐
+     *
+     * @param setmealDTO setmeal dto
+     */
+    void update(SetmealDTO setmealDTO);
 }
