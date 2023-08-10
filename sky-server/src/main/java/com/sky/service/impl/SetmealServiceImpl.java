@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
+import com.sky.entity.Employee;
 import com.sky.entity.Setmeal;
 import com.sky.entity.SetmealDish;
 import com.sky.mapper.SetmealDishMapper;
@@ -70,5 +71,17 @@ public class SetmealServiceImpl implements SetmealService {
         PageHelper.startPage(pageNum, pageSize);
         Page<SetmealVO> page = setmealMapper.pageQuery(setmealPageQueryDTO);
         return new PageResult(page.getTotal(), page.getResult());
+    }
+
+    /**
+     * 启动或停止套餐
+     *
+     * @param status 状态
+     * @param id     id
+     */
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        Setmeal setmeal = Setmeal.builder().status(status).id(id).build();
+        setmealMapper.update(setmeal);
     }
 }
