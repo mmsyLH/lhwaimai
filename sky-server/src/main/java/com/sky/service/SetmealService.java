@@ -6,6 +6,8 @@ import com.sky.result.PageResult;
 import com.sky.vo.SetmealVO;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * @author :罗汉
  * @date : 2023/8/10
@@ -35,4 +37,11 @@ public interface SetmealService {
      * @param id     id
      */
     void startOrStop(Integer status, Long id);
+
+    /**
+     * 批量删除套餐
+     *
+     * @param ids id
+     */
+    void delete(List<Long> ids);
 }
