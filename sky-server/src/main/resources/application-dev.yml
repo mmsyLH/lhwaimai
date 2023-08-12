@@ -11,4 +11,9 @@ sky:
     access-key-id: LTAI5tEgoRKAWTTF77dCnUVw
     access-key-secret: mpuzpVeQuMErqWlJtGgQKyFO0xzM0t
     bucket-name: lhwaimai
+  redis:
+    host: localhost
+    port: 6379
+    password: root
+    database: 10
 
