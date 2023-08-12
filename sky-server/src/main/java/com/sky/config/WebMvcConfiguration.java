@@ -47,7 +47,30 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
      * @return
      */
     @Bean
-    public Docket docket() {
+    public Docket docket1() {
+        log.info("准备生成罗汉外卖管理端接口文档");
+        ApiInfo apiInfo = new ApiInfoBuilder()
+                .title("罗汉外卖项目接口文档")
+                .version("2.0")
+                .description("罗汉外卖项目接口文档")
+                .build();
+        Docket docket = new Docket(DocumentationType.SWAGGER_2)
+                .groupName("管理端接口")
+                .apiInfo(apiInfo)
+                .select()
+                //指定要扫码的包
+                .apis(RequestHandlerSelectors.basePackage("com.sky.controller.admin"))
+                .paths(PathSelectors.any())
+                .build();
+        return docket;
+    }
+
+    /**
+     * 通过knife4j生成接口文档
+     * @return
+     */
+    @Bean
+    public Docket docket2() {
         log.info("准备生成接口文档");
         ApiInfo apiInfo = new ApiInfoBuilder()
                 .title("罗汉外卖项目接口文档")
@@ -55,10 +78,11 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
                 .description("罗汉外卖项目接口文档")
                 .build();
         Docket docket = new Docket(DocumentationType.SWAGGER_2)
+                .groupName("用户端接口")
                 .apiInfo(apiInfo)
                 .select()
                 //指定要扫码的包
-                .apis(RequestHandlerSelectors.basePackage("com.sky.controller"))
+                .apis(RequestHandlerSelectors.basePackage("com.sky.controller.user"))
                 .paths(PathSelectors.any())
                 .build();
         return docket;
