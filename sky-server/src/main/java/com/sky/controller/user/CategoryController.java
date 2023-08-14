@@ -16,6 +16,9 @@ import java.util.List;
 @Api(tags = "C端-分类接口")
 public class CategoryController {
 
+    /**
+     * 目录服务
+     */
     @Autowired
     private CategoryService categoryService;
 
