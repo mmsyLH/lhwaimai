@@ -75,4 +75,17 @@ public class CartServiceImpl implements CartService {
 
 
     }
+
+    /**
+     * 显示购物车
+     *
+     * @return {@link List}<{@link ShoppingCart}>
+     */
+    @Override
+    public List<ShoppingCart> showCart() {
+        Long userId = BaseContext.getCurrentId();
+        ShoppingCart shoppingCart = ShoppingCart.builder().userId(userId).build();
+        List<ShoppingCart> list = cartMapper.list(shoppingCart);
+        return list;
+    }
 }
