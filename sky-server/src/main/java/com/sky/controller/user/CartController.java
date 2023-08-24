@@ -50,4 +50,16 @@ public class CartController {
         List<ShoppingCart> shoppingCartList=cartService.showCart();
         return Result.success(shoppingCartList);
     }
+
+    /**
+     * 清空购物车
+     *
+     * @return {@link Result}
+     */
+    @DeleteMapping("/clean")
+    @ApiOperation(value = "清空购物车")
+    public Result clean(){
+        cartService.cleanCart();
+        return Result.success();
+    }
 }

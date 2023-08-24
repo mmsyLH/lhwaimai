@@ -23,4 +23,9 @@ public interface CartService {
      * @return {@link List}<{@link ShoppingCart}>
      */
     List<ShoppingCart> showCart();
+
+    /**
+     * 清空购物车
+     */
+    void cleanCart();
 }
