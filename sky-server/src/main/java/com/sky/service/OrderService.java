@@ -2,9 +2,11 @@ package com.sky.service;
 
 import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
+import com.sky.entity.OrderDetail;
 import com.sky.result.PageResult;
 import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderSubmitVO;
+import com.sky.vo.OrderVO;
 
 /**
  * 订单服务
@@ -44,4 +46,12 @@ public interface OrderService {
      * @return {@link PageResult}
      */
     PageResult page(int page, int pageSize, Integer status);
+
+    /**
+     * 根据订单id查询订单详情
+     *
+     * @param id id
+     * @return {@link OrderDetail}
+     */
+    OrderVO queryOrderDetailById(Long id);
 }
