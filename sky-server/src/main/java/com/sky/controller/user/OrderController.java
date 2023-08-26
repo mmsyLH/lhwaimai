@@ -2,6 +2,7 @@ package com.sky.controller.user;
 
 import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
+import com.sky.entity.OrderDetail;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.OrderService;
@@ -62,4 +63,14 @@ public class OrderController {
         PageResult pageResult= orderService.page(page,pageSize,status);
         return Result.success(pageResult);
     }
+
+    @GetMapping("orderDetail/{id}")
+    @ApiOperation("根据订单id查询订单详情")
+    public Result<OrderVO> queryOrderDetailById(@PathVariable Long id){
+        log.info("根据订单id查询订单详情打的id为,{}",id);
+        OrderVO orderVO=  orderService.queryOrderDetailById(id);
+        return Result.success(orderVO);
+    }
+
+
 }
