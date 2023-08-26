@@ -61,4 +61,11 @@ public interface OrderService {
      * @param id id
      */
     void cancelOrder(Long id);
+
+    /**
+     * 再一次订单
+     *
+     * @param id id
+     */
+    void againOrder(Long id);
 }
