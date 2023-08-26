@@ -10,6 +10,7 @@ import com.sky.vo.OrderVO;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 /**
  * @author :罗汉
@@ -43,4 +44,6 @@ public interface OrderMapper {
     Page<Orders> pageQuery(OrdersPageQueryDTO ordersPageQueryDTO);
     @Select("select * from orders where id = #{id}")
     Orders getById(Long id);
+    @Update("update orders set status = #{status} where id=#{id}")
+    void cancelOrder(Orders orders);
 }

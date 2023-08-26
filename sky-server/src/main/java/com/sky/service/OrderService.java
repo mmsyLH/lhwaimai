@@ -54,4 +54,11 @@ public interface OrderService {
      * @return {@link OrderDetail}
      */
     OrderVO queryOrderDetailById(Long id);
+
+    /**
+     * 取消订单
+     *
+     * @param id id
+     */
+    void cancelOrder(Long id);
 }
