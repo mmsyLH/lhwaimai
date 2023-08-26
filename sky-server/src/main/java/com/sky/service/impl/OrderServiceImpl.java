@@ -218,4 +218,18 @@ public class OrderServiceImpl implements OrderService {
 
         return orderVO;
     }
+
+    /**
+     * 取消订单
+     *
+     * @param id id
+     */
+    @Override
+    public void cancelOrder(Long id) {
+        Orders order = new Orders();
+        order.setUserId(BaseContext.getCurrentId());
+        order.setStatus(Orders.CANCELLED);
+        order.setId(id);
+        orderMapper.cancelOrder(order);
+    }
 }
