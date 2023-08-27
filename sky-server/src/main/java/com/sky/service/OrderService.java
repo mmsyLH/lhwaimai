@@ -102,4 +102,18 @@ public interface OrderService {
      * @param ordersCancelDTO 订单取消dto
      */
     void cancel(OrdersCancelDTO ordersCancelDTO);
+
+    /**
+     * 派送订单
+     *
+     * @param id id
+     */
+    void delivery(Long id);
+
+    /**
+     * 完成订单
+     *
+     * @param id id
+     */
+    void complete(Long id);
 }
