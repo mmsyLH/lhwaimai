@@ -1,9 +1,11 @@
 package com.sky.controller.admin;
 
 import com.sky.dto.OrdersPageQueryDTO;
+import com.sky.entity.OrderDetail;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.OrderService;
+import com.sky.vo.OrderVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -33,5 +35,18 @@ public class OrderController {
     public Result<PageResult> orderSearch(OrdersPageQueryDTO ordersPageQueryDTO){
         PageResult pageResult = orderService.orderSearch(ordersPageQueryDTO);
         return Result.success(pageResult);
+    }
+
+    /**
+     * 通过Id查询订单详情
+     *
+     * @param id id
+     * @return {@link Result}<{@link OrderVO}>
+     */
+    @GetMapping("details/{id}")
+    @ApiOperation("查询订单详情")
+    public Result<OrderVO> orderSearchDetail(@PathVariable Long id){
+        OrderVO orderVO= orderService.queryOrderDetailById(id);
+        return Result.success(orderVO);
     }
 }
