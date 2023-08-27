@@ -28,7 +28,7 @@ public class OrderTask {
      */
     @Scheduled(cron = "0 * * * * ?")//每分钟触发
     private void processTimeOutOrder(){
-        log.info("定时处理订单：{}", LocalDateTime.now());
+        // log.info("定时处理订单：{}", LocalDateTime.now());
         LocalDateTime localDateTime = LocalDateTime.now().plusMinutes(-15);
         //select * from orders where status=? and order_time<(当前时间-15分钟)
         //查询
@@ -49,7 +49,19 @@ public class OrderTask {
      * 处理一直处于派送中的订单
      */
     @Scheduled(cron="0 0 1 * * ?")//每天凌晨1点触发一次
+    // @Scheduled(cron="0/6 * * * * ?")//临时每5秒触发一次
     private void processDeliveryOrder( ){
+        log.info("定时处理处于派送中的订单,{}",LocalDateTime.now());
+        LocalDateTime localDateTime = LocalDateTime.now().plusHours(-1);
+        //select * from orders where status=? and order_time<(当前时间-1小时)
+        List<Orders> ordersList = orderMapper.getByStatusAndOrderTime(Orders.DELIVERY_IN_PROGRESS, localDateTime);//4
+
+        if (ordersList!=null && ordersList.size()>0){
+            for (Orders orders : ordersList) {
+                orders.setStatus(Orders.COMPLETED);
+                orderMapper.update(orders);
+            }
+        }
 
     }
 }
