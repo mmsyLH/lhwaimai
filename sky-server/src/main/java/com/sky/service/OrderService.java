@@ -89,5 +89,17 @@ public interface OrderService {
      */
     void confirm(OrdersConfirmDTO ordersConfirmDTO);
 
+    /**
+     * 拒绝接单
+     *
+     * @param ordersRejectionDTO 订单被拒绝dto
+     */
     void rejection(OrdersRejectionDTO ordersRejectionDTO);
+
+    /**
+     * 取消订单
+     *
+     * @param ordersCancelDTO 订单取消dto
+     */
+    void cancel(OrdersCancelDTO ordersCancelDTO);
 }
