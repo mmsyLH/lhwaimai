@@ -5,6 +5,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
+import com.sky.dto.OrdersConfirmDTO;
 import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
@@ -238,7 +239,7 @@ public class OrderServiceImpl implements OrderService {
             throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
         }
 
-        //订单状态 1待付款 2待接单 3已接单 4派送中 5已完成 6已取消
+        // 订单状态 1待付款 2待接单 3已接单 4派送中 5已完成 6已取消
         if (ordersDB.getStatus() > 2) {
             throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
         }
@@ -248,14 +249,14 @@ public class OrderServiceImpl implements OrderService {
 
         // 订单处于待接单状态下取消，需要进行退款
         if (ordersDB.getStatus().equals(Orders.TO_BE_CONFIRMED)) {
-            //调用微信支付退款接口
+            // 调用微信支付退款接口
             // weChatPayUtil.refund(
             //         ordersDB.getNumber(), //商户订单号
             //         ordersDB.getNumber(), //商户退款单号
             //         new BigDecimal(0.01),//退款金额，单位 元
             //         new BigDecimal(0.01));//原订单金额
 
-            //支付状态修改为 退款
+            // 支付状态修改为 退款
             orders.setPayStatus(Orders.REFUND);
         }
         // 更新订单状态、取消原因、取消时间
@@ -277,7 +278,7 @@ public class OrderServiceImpl implements OrderService {
         // 根据订单id查询当前订单详情
         List<OrderDetail> orderDetailList = orderDetailMapper.getByOrderId(id);
 
-        //方法1 将订单详情对象转换为购物车对象
+        // 方法1 将订单详情对象转换为购物车对象
         // List<ShoppingCart> shoppingCartList = orderDetailList.stream().map(x -> {
         //     ShoppingCart shoppingCart = new ShoppingCart();
         //
@@ -288,7 +289,7 @@ public class OrderServiceImpl implements OrderService {
         //
         //     return shoppingCart;
         // }).collect(Collectors.toList());
-        //方法2 将订单详情对象转换为购物车对象
+        // 方法2 将订单详情对象转换为购物车对象
         List<ShoppingCart> shoppingCartList = new ArrayList<>();
         for (OrderDetail orderDetail : orderDetailList) {
             ShoppingCart shoppingCart = new ShoppingCart();
@@ -330,9 +331,9 @@ public class OrderServiceImpl implements OrderService {
      */
     public OrderStatisticsVO statistics() {
         // 根据状态，分别查询出待接单、待派送、派送中的订单数量
-        Integer toBeConfirmed = orderMapper.countStatus(Orders.TO_BE_CONFIRMED);//2
-        Integer confirmed = orderMapper.countStatus(Orders.CONFIRMED);//3
-        Integer deliveryInProgress = orderMapper.countStatus(Orders.DELIVERY_IN_PROGRESS);//4
+        Integer toBeConfirmed = orderMapper.countStatus(Orders.TO_BE_CONFIRMED);// 2
+        Integer confirmed = orderMapper.countStatus(Orders.CONFIRMED);// 3
+        Integer deliveryInProgress = orderMapper.countStatus(Orders.DELIVERY_IN_PROGRESS);// 4
 
         // 将查询出的数据封装到orderStatisticsVO中响应
         OrderStatisticsVO orderStatisticsVO = new OrderStatisticsVO();
@@ -340,6 +341,20 @@ public class OrderServiceImpl implements OrderService {
         orderStatisticsVO.setConfirmed(confirmed);
         orderStatisticsVO.setDeliveryInProgress(deliveryInProgress);
         return orderStatisticsVO;
+    }
+
+    /**
+     * 接单
+     *
+     * @param ordersConfirmDTO 订单确认dto
+     */
+    @Override
+    public void confirm(OrdersConfirmDTO ordersConfirmDTO) {
+        Orders order = Orders.builder()
+                .id(ordersConfirmDTO.getId())
+                .status(Orders.CONFIRMED)
+                .build();
+        orderMapper.update(order);
     }
 
     /**
