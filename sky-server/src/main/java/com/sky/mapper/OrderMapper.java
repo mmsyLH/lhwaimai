@@ -12,6 +12,9 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 /**
  * @author :罗汉
  * @date : 2023/8/24
@@ -59,4 +62,14 @@ public interface OrderMapper {
      */
     @Select("select count(id) from orders where status = #{status}")
     Integer countStatus(Integer status);
+
+    /**
+     * 通过订单状态和下单时间查询订单
+     *
+     * @param status    状态
+     * @param orderTime 订单时间
+     * @return {@link List}<{@link Orders}>
+     */// select * from orders where status=? and order_time<(当前时间-15分钟)
+    @Select("select * from orders where status=#{status} and order_time<#{orderTime}")
+    List<Orders> getByStatusAndOrderTime(int status, LocalDateTime orderTime);
 }
