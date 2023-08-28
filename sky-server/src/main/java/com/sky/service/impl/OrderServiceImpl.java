@@ -490,6 +490,29 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
+     * 客户催单
+     *
+     * @param id id
+     */
+    @Override
+    public void reminder(long id) {
+        //1 确认一下有没有这个订单
+        Orders ordersDB = orderMapper.getById(id);
+        if (ordersDB == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+
+        //2 订单是存在的
+        Map map=new HashMap();
+        map.put("type",2);
+        map.put("orderId",id);
+        map.put("content","订单号："+ordersDB.getNumber());
+
+        //通过webSocket向客户端浏览器推送消息
+        webSocketServer.sendToAllClient(JSON.toJSONString(map));
+    }
+
+    /**
      * 得到订单volist
      *
      * @param page 页面
