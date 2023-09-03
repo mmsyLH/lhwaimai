@@ -3,6 +3,7 @@ package com.sky.controller.admin;
 import com.sky.result.Result;
 import com.sky.service.ReportService;
 import com.sky.vo.OrderReportVO;
+import com.sky.vo.SalesTop10ReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import io.swagger.annotations.Api;
@@ -63,5 +64,21 @@ public class ReportController {
         log.info("订单统计的时间范围为开始：{},{}",begin,end);
         OrderReportVO orderReportVO = reportService.getOrdersStatistics(begin, end);
         return Result.success(orderReportVO);
+    }
+
+    /**
+     * 商品销量前10查询
+     * @param begin
+     * @param end
+     * @return {@link Result}<{@link OrderReportVO}>
+     */
+    @GetMapping("/top10")
+    @ApiOperation("销量排名前10统计")
+    public Result<SalesTop10ReportVO> salesTop10(
+            @DateTimeFormat(pattern = "yyyy-MM-dd")  LocalDate begin,
+            @DateTimeFormat(pattern = "yyyy-MM-dd")LocalDate end){
+        log.info("销量排名前10统计时间范围为：{},{}",begin,end);
+        SalesTop10ReportVO salesTop10ReportVO = reportService.getDishStatistics(begin, end);
+        return Result.success(salesTop10ReportVO);
     }
 }
