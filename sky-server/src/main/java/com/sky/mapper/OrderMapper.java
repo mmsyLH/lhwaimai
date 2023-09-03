@@ -14,6 +14,7 @@ import org.apache.ibatis.annotations.Update;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author :罗汉
@@ -72,4 +73,11 @@ public interface OrderMapper {
      */// select * from orders where status=? and order_time<(当前时间-15分钟)
     @Select("select * from orders where status=#{status} and order_time<#{orderTime}")
     List<Orders> getByStatusAndOrderTime(int status, LocalDateTime orderTime);
+
+    /**
+     * 根据动态条件来统计营业额数据
+     * @param map
+     * @return {@link Double}
+     */
+    Double sumByMap(Map map);
 }
