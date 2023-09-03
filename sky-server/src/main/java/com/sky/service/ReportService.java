@@ -1,5 +1,6 @@
 package com.sky.service;
 
+import com.sky.vo.OrderReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -16,13 +17,22 @@ public interface ReportService {
      *
      * @return {@link TurnoverReportVO}
      */
-    TurnoverReportVO getTurnoverStatistics(LocalDate begin,LocalDate end);
+    TurnoverReportVO getTurnoverStatistics(LocalDate begin, LocalDate end);
 
     /**
      * 获得指定时间范围用户统计
+     *
      * @param begin
      * @param end
      * @return {@link UserReportVO}
      */
     UserReportVO getUserStatistics(LocalDate begin, LocalDate end);
+
+    /**
+     * 获得指定时间范围的订单统计
+     * @param begin
+     * @param end
+     * @return {@link OrderReportVO}
+     */
+    OrderReportVO getOrdersStatistics(LocalDate begin, LocalDate end);
 }
