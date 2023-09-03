@@ -6,6 +6,7 @@ import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
 
 /**
@@ -44,4 +45,10 @@ public interface ReportService {
      * @return {@link SalesTop10ReportVO}
      */
     SalesTop10ReportVO getDishStatistics(LocalDate begin, LocalDate end);
+
+    /**
+     * 导出运营数据报表
+     * @param httpServletResponse
+     */
+    void export(HttpServletResponse httpServletResponse);
 }

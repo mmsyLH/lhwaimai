@@ -6,15 +6,20 @@ import com.sky.mapper.OrderMapper;
 import com.sky.mapper.ReportMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
-import com.sky.vo.OrderReportVO;
-import com.sky.vo.SalesTop10ReportVO;
-import com.sky.vo.TurnoverReportVO;
-import com.sky.vo.UserReportVO;
+import com.sky.service.WorkspaceService;
+import com.sky.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -37,6 +42,8 @@ public class ReportServiceImpl implements ReportService {
     private OrderMapper orderMapper;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private WorkspaceService workspaceService;
 
     /**
      * 获得指定时间范围营业额统计
@@ -83,11 +90,8 @@ public class ReportServiceImpl implements ReportService {
         }
 
         // 封装返回结果
-        return TurnoverReportVO
-                .builder()
-                .dateList(str)// lang3的包
-                .turnoverList(StringUtils.join(turnoverList, ","))
-                .build();
+        return TurnoverReportVO.builder().dateList(str)// lang3的包
+                .turnoverList(StringUtils.join(turnoverList, ",")).build();
     }
 
     /**
@@ -135,11 +139,7 @@ public class ReportServiceImpl implements ReportService {
         String daTeStr = StringUtils.join(datalist, ",");
         String totalUserStr = StringUtils.join(totalUserList, ",");
         String newUserStr = StringUtils.join(newUserList, ",");
-        UserReportVO buildVO = UserReportVO.builder()
-                .dateList(daTeStr)
-                .newUserList(newUserStr)
-                .totalUserList(totalUserStr)
-                .build();
+        UserReportVO buildVO = UserReportVO.builder().dateList(daTeStr).newUserList(newUserStr).totalUserList(totalUserStr).build();
         return buildVO;
     }
 
@@ -190,23 +190,16 @@ public class ReportServiceImpl implements ReportService {
         Integer validOrderCount = validOrderCountList.stream().reduce(Integer::sum).get();
 
         // 计算订单完成率
-        Double res=0.0;
-        if (totalOrderCount!=0){
-            res= validOrderCount.doubleValue()/totalOrderCount;
+        Double res = 0.0;
+        if (totalOrderCount != 0) {
+            res = validOrderCount.doubleValue() / totalOrderCount;
         }
 
         // 4 封装结果返回
         String daTeStr = StringUtils.join(datalist, ",");
         String orderCountListStr = StringUtils.join(orderCountList, ",");
         String validOrderCountListStr = StringUtils.join(validOrderCountList, ",");
-        OrderReportVO build = OrderReportVO.builder()
-                .dateList(daTeStr)
-                .orderCountList(orderCountListStr)
-                .validOrderCountList(validOrderCountListStr)
-                .validOrderCount(validOrderCount)
-                .totalOrderCount(totalOrderCount)
-                .orderCompletionRate(res)
-                .build();
+        OrderReportVO build = OrderReportVO.builder().dateList(daTeStr).orderCountList(orderCountListStr).validOrderCountList(validOrderCountListStr).validOrderCount(validOrderCount).totalOrderCount(totalOrderCount).orderCompletionRate(res).build();
         return build;
     }
 
@@ -222,32 +215,102 @@ public class ReportServiceImpl implements ReportService {
         LocalDateTime beginTime = LocalDateTime.of(begin, LocalTime.MIN); // 2023.9.1 0:00
         LocalDateTime endTime = LocalDateTime.of(end, LocalTime.MAX); // 2023.9.1 23:59
         List<GoodsSalesDTO> salesTop10 = orderMapper.getSalesTop10(beginTime, endTime);
-        //格式处理  list转vo
+        // 格式处理  list转vo
         List<String> names = salesTop10.stream().map(GoodsSalesDTO::getName).collect(Collectors.toList());
         List<Integer> numbers = salesTop10.stream().map(GoodsSalesDTO::getNumber).collect(Collectors.toList());
 
         String nameStr = StringUtils.join(names, ",");
         String numbersStr = StringUtils.join(numbers, ",");
-        return SalesTop10ReportVO
-                .builder()
-                .nameList(nameStr)
-                .numberList(numbersStr)
-                .build();
+        return SalesTop10ReportVO.builder().nameList(nameStr).numberList(numbersStr).build();
+
+    }
+
+
+    /**
+     * 导出运营数据报表
+     *
+     * @param httpServletResponse
+     */
+    @Override
+    public void export(HttpServletResponse httpServletResponse) {
+        // 1 查询数据库获取营业数据 30天
+        // 1.1 查询最近30天的数据
+        LocalDate dateBegin = LocalDate.now().minusDays(30);
+        LocalDate dateEnd = LocalDate.now().minusDays(1);
+
+        // 查询概览数据
+        BusinessDataVO businessDataVO = workspaceService.getBusinessData(LocalDateTime.of(dateBegin, LocalTime.MIN), LocalDateTime.of(dateEnd, LocalTime.MAX));
+
+        //2. 通过POI将数据写入到Excel文件中
+        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("template/运营数据报表模板.xlsx");
+
+
+        try {
+            // 基于模版文件创建一个新的Excel文件
+            XSSFWorkbook excel = new XSSFWorkbook(inputStream);
+
+            // 2.1 填充数据------时间
+            // 获取表格文件的sheet1标签页
+            XSSFSheet sheet1 = excel.getSheet("Sheet1");
+            // 获取行 第二行
+            sheet1.getRow(1).getCell(1).setCellValue("时间:" + dateBegin + "至" + dateEnd);
+
+            // 2.2 填充-----概览数据
+
+            // 获得第四行
+            XSSFRow row = sheet1.getRow(3);
+            row.getCell(2).setCellValue(businessDataVO.getTurnover());   // 设置营业额
+            row.getCell(4).setCellValue(businessDataVO.getOrderCompletionRate());  // 填充订单完成率
+            row.getCell(6).setCellValue(businessDataVO.getNewUsers());   // 新增用户数
+            // 获得第5行
+            row = sheet1.getRow(4);
+            row.getCell(2).setCellValue(businessDataVO.getValidOrderCount());// 有效订单
+            row.getCell(4).setCellValue(businessDataVO.getUnitPrice());// 平均客单价
+
+            // 2.3 填充明细数据
+            for (int i = 0; i < 30; i++) {
+                LocalDate date = dateBegin.plusDays(i);
+                // 查询某一天的营业数据
+                BusinessDataVO businessData = workspaceService.getBusinessData(LocalDateTime.of(date, LocalTime.MIN), LocalDateTime.of(date, LocalTime.MAX));
+
+                // 获得某一行
+                row = sheet1.getRow(7 + i);// 第一次遍历就是第八行 下表为7
+                row.getCell(1).setCellValue(date.toString());//第2个单元格
+                row.getCell(2).setCellValue(businessData.getTurnover());//第3个单元格
+                row.getCell(3).setCellValue(businessData.getValidOrderCount());//第3个单元格
+                row.getCell(4).setCellValue(businessData.getOrderCompletionRate());//第3个单元格
+                row.getCell(5).setCellValue(businessData.getUnitPrice());//第3个单元格
+                row.getCell(6).setCellValue(businessData.getNewUsers());//第3个单元格
+            }
+
+
+            // 3 通过输出流将excel文件下载到客户端浏览器
+            ServletOutputStream outputStream = httpServletResponse.getOutputStream();
+            excel.write(outputStream);
+
+            // 4 关闭资源
+            outputStream.close();
+            excel.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
 
     }
 
     /**
      * 根据条件统计订单数量
+     *
      * @param begin
      * @param end
      * @param status
      * @return {@link Integer}
      */
-    private Integer getOrderCount(LocalDateTime begin,LocalDateTime end,Integer status) {
-        Map map=new HashMap();
-        map.put("begin",begin);
-        map.put("end",end);
-        map.put("status",status);
-       return orderMapper.countByMap(map);
+    private Integer getOrderCount(LocalDateTime begin, LocalDateTime end, Integer status) {
+        Map map = new HashMap();
+        map.put("begin", begin);
+        map.put("end", end);
+        map.put("status", status);
+        return orderMapper.countByMap(map);
     }
 }
